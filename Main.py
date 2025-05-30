@@ -1,6 +1,7 @@
 import random
 from random import randint
 from dataclasses import dataclass
+
 class Character:
     
     Character_Amount = 0
@@ -72,7 +73,8 @@ class Character:
         
         Character_Amount += 1
         Self.ID = Character_Amount
-        
+
+       
 def Create_Stats( Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma ):
     
     return {
@@ -122,24 +124,7 @@ def Create_Equipment(Items, Amounts):
     
     return dict(zip(Items, Amounts))
     
-def Quick_Character(Name, Class, Level, Race, Size, HP, Hit_Dice):
-    
-    Strength = randint(-1,3); Dexterity = randint(-1,3); Constitution = randint(-1,3); Intelligence = randint(-1,3); Wisdom = randint(-1,3); Charisma = randint(-1,3)
-    
-    Speed = None
-    
-    if any( r in Race for r in ["Human", "Elf", "Tiefling", "Tabaxi"]):
-        Speed = 30
-    elif any( r in Race for r in ["Dwarf", "Gnome", "Halfling"]):
-        Speed = 25
-    else:
-        Speed = 40
-    
-    return Create_Character(Name, Class, Level, Race, Size, "None", "Neutral", "None", Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma, HP, Hit_Dice, "None", "None", 0, 0, 0, 10, 0, "None", "None", "None", "Common", "None")
-
-def Create_Character(Name, Class, Level, Race, Size, Background, Alignment, Human, Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma, HP, Hit_Dice, Equipment, Spells, CP, SP, EP, GP, PP, Backstory, Traits, Features, Languages, Notes):
-    
-    Speed = None
+def Calculate_Speed(Race):
     
     if any( r in Race for r in ["Human", "Elf", "Tiefling", "Tabaxi"]):
         Speed = 30
@@ -148,10 +133,27 @@ def Create_Character(Name, Class, Level, Race, Size, Background, Alignment, Huma
     else:
         Speed = 40
         
+    return Speed
+  
+    
+def Quick_Character(Name, Class, Level, Race, Size, HP, Hit_Dice):
+    
+    Strength = randint(-1,3); Dexterity = randint(-1,3); Constitution = randint(-1,3); Intelligence = randint(-1,3); Wisdom = randint(-1,3); Charisma = randint(-1,3)
+    
+    Speed = Calculate_Speed(Race)
+    
+    return Create_Character(Name, Class, Level, Race, Size, "None", "Neutral", "None", Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma, HP, Hit_Dice, "None", "None", 0, 0, 0, 10, 0, "None", "None", "None", "Common", "None")
+
+def Create_Character(Name, Class, Level, Race, Size, Background, Alignment, Human, Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma, HP, Hit_Dice, Equipment, Spells, CP, SP, EP, GP, PP, Backstory, Traits, Features, Languages, Notes):
+    
+    Speed = Calculate_Speed(Race)
+        Speed = 40
+        
     return Character(Name, Class, Level, Background, Race, Alignment, Size, Human, Create_Stats(Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma),
                      10 + ( Dexterity * 2 ), Dexterity, Speed, HP, Hit_Dice, 2 + (Level - 1) // 4,
                      Create_Saving_Rolls(Strength,Dexterity,Constitution,Intelligence,Wisdom,Charisma,Class,2 + (Level - 1) // 4),
                      Equipment, Spells, Create_Coins(CP, EP, PP, GP, SP), Backstory, Traits, Features, Languages, Notes, {"Success": 0, "Failure": 0})
+
 
 Test_Character = Quick_Character("Test", "Fighter", 1, "Human", "Medium", 10, "1d10")
 

@@ -1,30 +1,28 @@
 import random
-from random import *
-
-Character_Amount = 0
-
+from random import randint
+from dataclasses import dataclass
 class Character:
     
+    Character_Amount = 0
+    @dataclass
     class Coins:
-        def __init__(Self):
-            Self.CP = 0
-            Self.EP = 0
-            Self.PP = 0
-            Self.GP = 0
-            Self.SP = 0
-            
+        CP: int
+        EP: int
+        PP: int
+        GP: int
+        SP: int
+          
+    @dataclass  
     class Main_Stats:
-        def __init__(Self):
-            Self.Strength = 0
-            Self.Dexterity = 0
-            Self.Constitution = 0
-            Self.Intelligence = 0
-            Self.Wisdom = 0
-            Self.Charisma = 0
+        Strength: int
+        Dexterity: int
+        Constitution: int
+        Intelligence: int
+        Wisdom: int
+        Charisma: int
+    
     
     def __init__(Self, Name, Class, Level, Background, Race, Alignment, Size, Human, Stats, Armor_Class, Initiative, Speed, Hit_Points, Hit_Dice, Proficiency_Bonus, Saving_Throws, Equipment, Spells, Currency, Backstory, Traits, Features, Languages, Notes, Death_Saves):
-        
-        global Character_Amount
         
         Self.Name = Name
         Self.Class = Class
@@ -69,9 +67,7 @@ class Character:
         Self.Stats.Wisdom = Stats["Wisdom"]
         Self.Stats.Charisma = Stats["Charisma"]
         
-        if Spells != None:
-            Self.Speed = Spells
-        else:
+        Self.Spells = Spells if Spells is not None else "None"
             Self.Spells = "None"
         
         Character_Amount += 1
@@ -124,14 +120,7 @@ def Create_Coins(CP, EP, PP, GP, SP):
     
 def Create_Equipment(Items, Amounts):
     
-    Equipment = {}
-    
-    for item in range(len(Items)):
-        Equipment.append({Items[item]: Amounts[item]})
-        
-    return Equipment
-        
-        
+    return dict(zip(Items, Amounts))
     
 def Quick_Character(Name, Class, Level, Race, Size, HP, Hit_Dice):
     

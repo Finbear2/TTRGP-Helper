@@ -13,26 +13,42 @@ class Character:
         GP: int
         SP: int
           
-    @dataclass  
-    class Main_Stats:
-        Strength: int
-        Dexterity: int
-        Constitution: int
-        Intelligence: int
-        Wisdom: int
-        Charisma: int
-    
+    @dataclass
+    class All_Stats:
+        
+        @dataclass  
+        class Main_Stats:
+            Strength: int
+            Dexterity: int
+            Constitution: int
+            Intelligence: int
+            Wisdom: int
+            Charisma: int
+            
+        @dataclass
+        class Basic_Stats:
+            Name: str
+            Class: str
+            Level: int
+            Background: str
+            Race: str
+            Alignment: str
+            Size: str
+            Human: str
+        
+    @dataclass
+    class Death_Saves:
+        Success: int
+        Failure: int
     
     def __init__(Self, Name, Class, Level, Background, Race, Alignment, Size, Human, Stats, Armor_Class, Initiative, Speed, Hit_Points, Hit_Dice, Proficiency_Bonus, Saving_Throws, Equipment, Spells, Currency, Backstory, Traits, Features, Languages, Notes, Death_Saves):
+    
+        Self.Currency = Self.Coins( Currency["Copper"], Currency["Electrum"], Currency["Platinum"], Currency["Gold"], Currency["Silver"] )
         
-        Self.Name = Name
-        Self.Class = Class
-        Self.Level = Level
-        Self.Background = Background
-        Self.Race = Race
-        Self.Alignment = Alignment
-        Self.Size = Size
-        Self.Human = Human  
+        Self.Stats = Self.All_Stats()
+        Self.Stats.Main_Stats = Self.All_Stats.Main_Stats( Stats["Strength"], Stats["Dexterity"], Stats["Constitution"], Stats["Intelligence"], Stats["Wisdom"], Stats["Charisma"] )
+        Self.Stats.Base_Stats = Self.All_Stats.Basic_Stats( Name, Class, Level, Background, Race, Alignment, Size, Human )
+
         Self.Armor_Class = Armor_Class
         Self.Initiative = Initiative
         Self.Speed = Speed
@@ -51,30 +67,12 @@ class Character:
         Self.Successes = Death_Saves["Success"]
         Self.Failures = Death_Saves["Failure"]
         
-        Self.Currency = Self.Coins()
-        
-        Self.Currency.CP = Currency["Copper"]
-        Self.Currency.EP = Currency["Electrum"]
-        Self.Currency.PP = Currency["Platinum"]
-        Self.Currency.GP = Currency["Gold"]
-        Self.Currency.SP = Currency["Silver"]
-        
-        Self.Stats = Self.Main_Stats()
-        
-        Self.Stats.Strength = Stats["Strength"]
-        Self.Stats.Dexterity = Stats["Dexterity"]
-        Self.Stats.Constitution = Stats["Constitution"]
-        Self.Stats.Intelligence = Stats["Intelligence"]
-        Self.Stats.Wisdom = Stats["Wisdom"]
-        Self.Stats.Charisma = Stats["Charisma"]
-        
         Self.Spells = Spells if Spells is not None else "None"
-            Self.Spells = "None"
         
-        Character_Amount += 1
-        Self.ID = Character_Amount
+        Self.Character_Amount += 1
+        Self.ID = Self.Character_Amount
 
-       
+
 def Create_Stats( Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma ):
     
     return {
@@ -140,14 +138,11 @@ def Quick_Character(Name, Class, Level, Race, Size, HP, Hit_Dice):
     
     Strength = randint(-1,3); Dexterity = randint(-1,3); Constitution = randint(-1,3); Intelligence = randint(-1,3); Wisdom = randint(-1,3); Charisma = randint(-1,3)
     
-    Speed = Calculate_Speed(Race)
-    
     return Create_Character(Name, Class, Level, Race, Size, "None", "Neutral", "None", Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma, HP, Hit_Dice, "None", "None", 0, 0, 0, 10, 0, "None", "None", "None", "Common", "None")
 
 def Create_Character(Name, Class, Level, Race, Size, Background, Alignment, Human, Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma, HP, Hit_Dice, Equipment, Spells, CP, SP, EP, GP, PP, Backstory, Traits, Features, Languages, Notes):
     
     Speed = Calculate_Speed(Race)
-        Speed = 40
         
     return Character(Name, Class, Level, Background, Race, Alignment, Size, Human, Create_Stats(Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma),
                      10 + ( Dexterity * 2 ), Dexterity, Speed, HP, Hit_Dice, 2 + (Level - 1) // 4,

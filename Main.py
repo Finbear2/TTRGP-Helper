@@ -4,76 +4,65 @@ from dataclasses import dataclass
 
 from customtkinter import *
 
-Character_Amount = 0
-class Character:
-    
-    global Character_Amount
-    @dataclass
-    class Coins:
+Characters = []
+
+@dataclass
+class Coins:
         CP: int
         EP: int
         PP: int
         GP: int
         SP: int
-          
-    @dataclass
-    class All_Stats:
         
-        @dataclass
-        class Main_Stats:
-            Strength: int
-            Dexterity: int
-            Constitution: int
-            Intelligence: int
-            Wisdom: int
-            Charisma: int
+@dataclass
+class Main_Stats:
+    Main_Stats: dict
+    Armour_Class: int
+    Initiative: int
+    Speed: int
+    Hit_Points: int
+    Hit_Dice: str
+    proficiency_bonus: int
             
-        @dataclass
-        class Basic_Stats:
-            Name: str
-            Class: str
-            Level: int
-            Background: str
-            Race: str
-            Alignment: str
-            Size: str
-            Human: str
-        
-    @dataclass
-    class Death_Saves:
-        Success: int
-        Failure: int
+@dataclass
+class Basic_Stats:
+    Name: str
+    Class: str
+    Level: int
+    Background: str
+    Race: str
+    Alignment: str
+    Size: str
+    Human: str
+    Success: int
+    Failure: int
+    Saving_Rolls: int
     
-    def __init__(Self, Name, Class, Level, Background, Race, Alignment, Size, Human, Stats, Armor_Class, Initiative, Speed, Hit_Points, Hit_Dice, Proficiency_Bonus, Saving_Throws, Equipment, Spells, Currency, Backstory, Traits, Features, Languages, Notes, Death_Saves):
+@dataclass
+class Notes_Class:
     
-        Self.Currency = Self.Coins( Currency["Copper"], Currency["Electrum"], Currency["Platinum"], Currency["Gold"], Currency["Silver"] )
-        
-        Self.Stats = Self.All_Stats()
-        Self.Stats.Main_Stats = Self.All_Stats.Main_Stats( Stats["Strength"], Stats["Dexterity"], Stats["Constitution"], Stats["Intelligence"], Stats["Wisdom"], Stats["Charisma"] )
-        Self.Stats.Base_Stats = Self.All_Stats.Basic_Stats( Name, Class, Level, Background, Race, Alignment, Size, Human )
-
-        Self.Armor_Class = Armor_Class
-        Self.Initiative = Initiative
-        Self.Speed = Speed
-        Self.Hit_Points = Hit_Points
-        Self.Hit_Dice = Hit_Dice
-        Self.Proficiency_Bonus = Proficiency_Bonus
-        Self.Saving_Throws = Saving_Throws
+    Backstory: str
+    Traits: str
+    Features: str
+    Languages: str
+    Notes: str
+    
+    
+class Character:
+    
+    Character_Amount = 0
+    
+    def __init__(Self, Base_stats, Main_stats, Equipment, Spells, Currency, Notes):
+    
+        Self.Basic_Stats = Base_stats
+        Self.Main_Stats = Main_stats
         Self.Equipment = Equipment
-        Self.Backstory = Backstory
-        Self.Traits = Traits
-        Self.Features = Features
-        Self.Languages = Languages
+        Self.Currency = Currency
         Self.Notes = Notes
-        Self.Death_Saves = Death_Saves
         
-        Self.Successes = Death_Saves["Success"]
-        Self.Failures = Death_Saves["Failure"]
-        
-        Self.Spells = Spells if Spells is not None else "None"
-
-        Character_Amount += 1
-        Self.ID = Character_Amount
+        Self.Spells = Spells if Spells is not None else []
+        Characters.append(Self)
+        Character.Character_Amount += 1; Self.ID = Character.Character_Amount
 
 class Window(CTk):
     
@@ -126,7 +115,6 @@ class Window(CTk):
 
         Self.Tabs.pack(expand=True, fill="both", pady=(25, 0))
         
-    
 
 def Create_Stats( Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma ):
     
@@ -162,16 +150,6 @@ def Create_Saving_Rolls( Strength, Dexterity, Constitution, Intelligence, Wisdom
         "Wisdom": Wisdom,
         "Charisma": Charisma
     }
-       
-def Create_Coins(CP, EP, PP, GP, SP):
-    
-    return {
-        "Copper": CP,
-        "Electrum": EP,
-        "Platinum": PP,
-        "Gold": GP,
-        "Silver": SP
-    }
     
 def Create_Equipment(Items, Amounts):
     
@@ -188,6 +166,10 @@ def Calculate_Speed(Race):
         
     return Speed
   
+def Create_Spells(Spells, Descriptions):
+    
+    return dict(zip(Spells, Descriptions))
+    
     
 def Quick_Character(Name, Class, Level, Race, Size, HP, Hit_Dice):
     
@@ -199,10 +181,40 @@ def Create_Character(Name, Class, Level, Race, Size, Background, Alignment, Huma
     
     Speed = Calculate_Speed(Race)
         
-    return Character(Name, Class, Level, Background, Race, Alignment, Size, Human, Create_Stats(Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma),
-                     10 + Dexterity, Dexterity, Speed, HP, Hit_Dice, 2 + (Level - 1) // 4,
-                     Create_Saving_Rolls(Strength,Dexterity,Constitution,Intelligence,Wisdom,Charisma,Class,2 + (Level - 1) // 4),
-                     Equipment, Spells, Create_Coins(CP, EP, PP, GP, SP), Backstory, Traits, Features, Languages, Notes, {"Success": 0, "Failure": 0})
+    return Character(
+        Basic_Stats(
+            Name=Name,
+            Class=Class,
+            Level=Level,
+            Background=Background,
+            Race=Race,
+            Alignment=Alignment,
+            Human=Human,
+            Size=Size,
+            Success=0,
+            Failure=0,
+            Saving_Rolls=Create_Saving_Rolls(Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma, Class, 2)
+        ),
+        Main_Stats(
+            Create_Stats(Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma),
+            Armour_Class=10 + Dexterity,
+            Initiative=0 + Dexterity,
+            Speed=Speed,
+            Hit_Points=HP,
+            Hit_Dice=Hit_Dice,
+            proficiency_bonus=2
+        ),
+        Create_Equipment([],[]),
+        None,
+        Coins(CP=CP, SP=SP, EP=EP, GP=GP, PP=PP),
+        Notes_Class(
+            Backstory=Backstory,
+            Traits=Traits,
+            Features=Features,
+            Languages=Languages,
+            Notes=Notes
+        )
+    )
 
 
 Test_Character = Quick_Character("Test", "Fighter", 1, "Human", "Medium", 10, "1d10")

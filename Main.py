@@ -2,9 +2,12 @@ import random
 from random import randint
 from dataclasses import dataclass
 
+from customtkinter import *
+
+Character_Amount = 0
 class Character:
     
-    Character_Amount = 0
+    global Character_Amount
     @dataclass
     class Coins:
         CP: int
@@ -16,7 +19,7 @@ class Character:
     @dataclass
     class All_Stats:
         
-        @dataclass  
+        @dataclass
         class Main_Stats:
             Strength: int
             Dexterity: int
@@ -68,10 +71,62 @@ class Character:
         Self.Failures = Death_Saves["Failure"]
         
         Self.Spells = Spells if Spells is not None else "None"
-        
-        Self.Character_Amount += 1
-        Self.ID = Self.Character_Amount
 
+        Character_Amount += 1
+        Self.ID = Character_Amount
+
+class Window(CTk):
+    
+    def __init__(Self):
+        
+        super().__init__()
+        
+        def Make_Tab(Canvas, Colour):
+            
+            return Canvas.create_polygon( 0, 30, 20, 0, 100, 0, 120, 30, fill=Colour )
+        
+        def Home():
+            
+            Self.Tabs.set("Home")
+        
+        def Fight():
+            
+            Self.Tabs.set("Fight")
+            
+        BG_Colour = "#f6f3ed"
+        
+        BG_Colour_Home = "#b1c3c3"
+        BG_Colour_Fight = "#ffdbc1"
+        
+        Self.title("D&D Helper")
+        Self.geometry("1000x600")
+        Self.configure(fg_color=BG_Colour)
+        
+        Self.Tabs = CTkTabview(Self, corner_radius=8)
+        
+        Self.Home_Tab = CTkCanvas(Self, width=120, height=30, bg=BG_Colour)
+        Self.Fight_Tab = CTkCanvas(Self, width=120, height=30, bg=BG_Colour)
+        
+        Self.Home_Tab.place(x=10, y=8)
+        Self.Fight_Tab.place(x=140, y=8)
+
+        Self.Tab_Home_Polygon = Make_Tab(Self.Home_Tab, BG_Colour_Home)
+        Self.Tab_Fight_Polygon = Make_Tab(Self.Fight_Tab, BG_Colour_Fight)
+        
+        Self.Home_Tab.tag_bind(Self.Tab_Home_Polygon, "<Button-1>", lambda event: Home())
+        Self.Fight_Tab.tag_bind(Self.Tab_Fight_Polygon, "<Button-1>", lambda event: Fight())
+
+        Self.Tabs.add("Home")
+        Self.Tabs.add("Fight")
+        Self.Tabs.add("Settings")
+        Self.Tabs.add("About")
+
+        Self.Tabs.tab("Home").configure(fg_color=BG_Colour_Home)
+        Self.Tabs.tab("Fight").configure(fg_color=BG_Colour_Fight)
+
+        Self.Tabs.pack(expand=True, fill="both", pady=(25, 0))
+        
+    
 
 def Create_Stats( Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma ):
     
@@ -145,11 +200,13 @@ def Create_Character(Name, Class, Level, Race, Size, Background, Alignment, Huma
     Speed = Calculate_Speed(Race)
         
     return Character(Name, Class, Level, Background, Race, Alignment, Size, Human, Create_Stats(Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma),
-                     10 + ( Dexterity * 2 ), Dexterity, Speed, HP, Hit_Dice, 2 + (Level - 1) // 4,
+                     10 + Dexterity, Dexterity, Speed, HP, Hit_Dice, 2 + (Level - 1) // 4,
                      Create_Saving_Rolls(Strength,Dexterity,Constitution,Intelligence,Wisdom,Charisma,Class,2 + (Level - 1) // 4),
                      Equipment, Spells, Create_Coins(CP, EP, PP, GP, SP), Backstory, Traits, Features, Languages, Notes, {"Success": 0, "Failure": 0})
 
 
 Test_Character = Quick_Character("Test", "Fighter", 1, "Human", "Medium", 10, "1d10")
 
-print("D&D Helper")
+Window = Window()
+Window.Tabs._segmented_button.grid_forget()  # If grid is used
+Window.mainloop()
